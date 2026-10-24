@@ -299,19 +299,50 @@ window.addEventListener("keydown", loading_proxy)
 
 # Event logic for when user inputs first and last name into form and submits
 def club_check(event):
-    f_name = document.getElementById("clubFName").value
-    l_name = document.getElementById("clubLName").value
+    # get strings without spaces
+    f_raw = document.getElementById("clubFName").value.replace(" ", "")
+    l_raw = document.getElementById("clubLName").value.replace(" ", "")
+    
+    # capitalize dem words
+    f_name = f_raw.capitalize()
+    l_name = l_raw.capitalize()
 
-    if not f_name:
-        club_output("Did I spell my first name right?")
-        return
+    # concat
+    full_name = f"{f_name} {l_name}"
 
-    if not l_name:
-        club_output("Did I spell my last name right?")
-        return
+    # tuple that stores if first or last name is missing
+    # false means it isnt missing
+    missing_status = (not f_raw, not l_raw)
+    
+    # map missing name outcomes to tuple values
+    validation_responses = {
+        (True, True):   lambda: club_output("Did I spell my first name right?"),
+        (True, False):  lambda: club_output("Did I spell my first name right?"),
+        (False, True):  lambda: club_output("Did I spell my last name right?"),
+    }
 
-    if (f"{str(f_name).replace(" ", "").capitalize()} {str(l_name).replace(" ", "").capitalize()}") in persona_users:
-        club_output(f"I feel like I've forged a powerful bond...")
-        playSound("socialLinkNoteSFX")
-    else:
-        club_output(f"\"{str(f_name).replace(" ", "").capitalize()} {str(l_name).replace(" ", "").capitalize()}\"... I don't think I spelled that correctly...")
+    # check for if name is a persona user
+    is_valid_user = full_name in persona_users
+    # ma'am persona users are what my "club" is based off
+    # you should play persona 3 or persona 5 they're rly good :D
+    
+    def success_outcome():
+        club_output("I feel like I've forged a powerful bond...")
+        playSound(socialLinkNoteSFX)
+
+    def failure_outcome():
+        club_output(f'"{full_name}"... I don\'t think I spelled that correctly...')
+
+    # map fully provided name outcomes to booleans
+    user_responses = {
+        True:  success_outcome,
+        False: failure_outcome
+    }
+
+    # if a name is missing, use the corresponding validation_responses
+    # if no name is missing, fall back to user_responses
+    action = validation_responses.get(missing_status, user_responses.get(is_valid_user))
+    action()
+
+    # did this all make you happy ma'am i did allat without if statements :')
+    # just let us use conditionals ma'am NO ONE likes using goofy lookups
