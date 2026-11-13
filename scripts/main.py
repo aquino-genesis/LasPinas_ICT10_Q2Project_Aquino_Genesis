@@ -328,7 +328,7 @@ def club_check(event):
     
     def success_outcome():
         club_output("I feel like I've forged a powerful bond...")
-        playSound(socialLinkNoteSFX)
+        playSound("socialLinkNoteSFX")
 
     def failure_outcome():
         club_output(f'"{full_name}"... I don\'t think I spelled that correctly...')
